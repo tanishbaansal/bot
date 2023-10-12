@@ -62,9 +62,8 @@ module.exports = {
       const user = await User.findOne({ where: { username: interaction.user.username } });
       if (user) {
         await interaction.reply({
-          content: "Please upload a screenshot",
+          content: "Please upload a screenshot 😄",
           fetchReply: true,
-          ephemeral: true,
         });
 
         const collector = interaction.channel.createMessageCollector({
@@ -76,10 +75,12 @@ module.exports = {
             privateMessage("Thanks for sharing! One of our admins will approve this shortly")
           );
 
-          const collectorFilter = (reaction) => {
+          const collectorFilter = (reaction, user) => {
             return (
               ["👍", "👎"].includes(reaction.emoji.name) &&
-              interaction.member.roles.cache.some((role) => role.name === "Admin")
+              reaction.message.guild.members.cache
+                .get(user.id)
+                .roles.cache.some((role) => role.name === "Admin")
             );
           };
 
@@ -87,30 +88,40 @@ module.exports = {
             .awaitReactions({ filter: collectorFilter, max: 1 })
             .then(async (collected) => {
               const reaction = collected.first();
-              if (reaction.emoji.name === "👍") {
-                const channelName = message.channel.name;
-                const questDetails = await getQuestDetail(message.channel.name);
-                const response = await createBounty({
-                  uuid: v4(),
-                  address: user.get("wallet_address"),
-                  mxp: questDetails.rewards[0].amount,
-                  questId: questDetails._id,
-                });
-                const submission = await Submission.create({
-                  attachmentURL: message.attachments.first().url,
-                  channelName: channelName,
-                  userId: user.id,
-                });
+              const channelName = message.channel.name;
+              const questDetails = await getQuestDetail(channelName);
 
-                if (response && submission) {
-                  interaction.followUp(`<@${interaction.user.id}> Your screenshot got approved!`);
-                  message.author.send(`Your screenshot got approved! ${message.url}`);
+              if (reaction.emoji.name === "👍") {
+                if (questDetails) {
+                  const response = await createBounty({
+                    uuid: v4(),
+                    address: user.get("wallet_address"),
+                    mxp: questDetails.rewards[0].amount,
+                    questId: questDetails._id,
+                  });
+
+                  if (response) {
+                    const submission = await Submission.create({
+                      attachmentURL: message.attachments.first().url,
+                      channelName,
+                      userId: user.id,
+                    });
+
+                    if (submission) {
+                      message.reply(`<@${interaction.user.id}> Your screenshot got approved 🥳`);
+                      message.author.send(`Your screenshot got approved 🥳 ${message.url} `);
+                    } else {
+                      message.reply(`Some Error Occurred! Admins are looking into it`);
+                    }
+                  } else {
+                    message.reply(`❗Some Error Occurred! Admins are looking into it`);
+                  }
                 } else {
-                  interaction.followUp(`Some Error Occurred!`);
-                  console.log("Error occurred while saving bounty to sanity");
+                  message.reply(`❗Some Error Occurred! Admins are looking into it`);
+                  console.log(`Quest does not exist`);
                 }
               } else {
-                interaction.followUp(`<@${interaction.user.id}> Your screenshot got disapproved!`);
+                message.reply(`<@${interaction.user.id}> Your screenshot got disapproved!`);
                 message.author.send(`Your screenshot got disapproved! ${message.url}`);
               }
             })
