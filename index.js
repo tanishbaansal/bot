@@ -3,46 +3,66 @@ const path = require("node:path");
 const {
   Client,
   Collection,
+  GatewayIntentBits,
   Events,
   SlashCommandBuilder,
-  GatewayIntentBits,
 } = require("discord.js");
-const { token } = require("./config.json");
+const { botToken } = require("./config.json");
+const getWallet = require("./commands/wallet/get-wallet");
 
+const { User, Submission } = require("./database");
+const wallet = require("./commands/main/wallet");
+const downloadWallets = require("./commands/wallet/download-wallets");
+
+// Command files are now organized into subfolders
+const commandsPath = path.join(__dirname, "commands");
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildMessageReactions,
     GatewayIntentBits.MessageContent,
   ],
 });
 
 client.commands = new Collection();
-const foldersPath = path.join(__dirname, "commands");
-const commandFolders = fs.readdirSync(foldersPath);
 
-for (const folder of commandFolders) {
-  const commandsPath = path.join(foldersPath, folder);
-  const commandFiles = fs.readdirSync(commandsPath).filter((file) => file.endsWith(".js"));
-  for (const file of commandFiles) {
-    const filePath = path.join(commandsPath, file);
-    const command = require(filePath);
-    if ("data" in command && "execute" in command) {
-      client.commands.set(command.data.name, command);
-    } else {
-      console.log(
-        `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
-      );
+// Function to load commands from a directory
+const loadCommands = (dir) => {
+  const commandFolders = fs.readdirSync(dir);
+  for (const folder of commandFolders) {
+    const folderPath = path.join(dir, folder);
+    const commandFiles = fs.readdirSync(folderPath).filter((file) => file.endsWith(".js"));
+    for (const file of commandFiles) {
+      const filePath = path.join(folderPath, file);
+      const command = require(filePath);
+      if ("data" in command && "execute" in command) {
+        client.commands.set(command.data.name, command);
+      } else {
+        console.log(
+          `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
+        );
+      }
     }
   }
-}
+};
 
 client.once(Events.ClientReady, () => {
   console.log("Ready!");
+  User.sync();
+  Submission.sync();
   client.user.setActivity("Own Your Saga");
-  const start = new SlashCommandBuilder().setName("start").setDescription("Replies with Pong!");
-
-  client.application?.commands.create(start, "1154792166292455435");
+  client.application?.commands.create(
+    new SlashCommandBuilder()
+      .setName("react-await")
+      .setDescription("Provides information about the user."),
+    "1154792166292455435"
+  );
+  // Create commands using a loop and an array of command data
+  const commandData = [wallet.data, getWallet.data, downloadWallets.data];
+  for (const data of commandData) {
+    client.application?.commands.create(data, "1154792166292455435");
+  }
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
@@ -56,18 +76,20 @@ client.on(Events.InteractionCreate, async (interaction) => {
     await command.execute(interaction);
   } catch (error) {
     console.error(error);
+    const errorMessage = "There was an error while executing this command!";
+    const responseOptions = {
+      content: errorMessage,
+      ephemeral: true,
+    };
+
     if (interaction.replied || interaction.deferred) {
-      await interaction.followUp({
-        content: "There was an error while executing this command!",
-        ephemeral: true,
-      });
+      await interaction.followUp(responseOptions);
     } else {
-      await interaction.reply({
-        content: "There was an error while executing this command!",
-        ephemeral: true,
-      });
+      await interaction.reply(responseOptions);
     }
   }
 });
 
-client.login(token);
+client.login(botToken);
+
+loadCommands(commandsPath);
