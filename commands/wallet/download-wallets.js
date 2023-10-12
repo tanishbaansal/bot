@@ -38,10 +38,7 @@ module.exports = {
         await interaction.reply({ ephemeral: true, files: [file] });
       }
     } catch (error) {
-      await interaction.reply({
-        content: "An error occurred.",
-        ephemeral: true,
-      });
+      await interaction.reply(privateMessage("An error occurred."));
     }
   },
 };

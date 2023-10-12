@@ -71,10 +71,9 @@ module.exports = {
             message.attachments.size > 0 && message.author.id === interaction.user.id,
         });
         collector.on("collect", (message) => {
-          message.reply({
-            content: "Thanks for sharing! One of our admins will approve this shortly",
-            ephemeral: true,
-          });
+          message.reply(
+            privateMessage("Thanks for sharing! One of our admins will approve this shortly")
+          );
 
           const collectorFilter = (reaction) => {
             return (
@@ -119,10 +118,11 @@ module.exports = {
             });
         });
       } else {
-        await interaction.reply({
-          content: `Please submit your wallet address using the command \`/wallet\` first then do \`/submit\` again.`,
-          ephemeral: true,
-        });
+        await interaction.reply(
+          privateMessage(
+            `Please submit your wallet address using the command \`/wallet\` first then do \`/submit\` again.`
+          )
+        );
       }
     } catch (err) {
       console.error(err);

@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require("discord.js");
 const { User } = require("../../database");
 const WAValidator = require("wallet-address-validator");
+const { privateMessage } = require("../../utils/message");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -14,10 +15,7 @@ module.exports = {
 
     var valid = WAValidator.validate(walletAddress, "eth");
     if (!valid) {
-      await interaction.reply({
-        content: `Please provide a correct wallet address.`,
-        ephemeral: true,
-      });
+      await interaction.reply(privateMessage(`Please provide a correct wallet address.`));
     } else {
       try {
         const user = await User.findOne({ where: { username: interaction.user.username } });
@@ -28,10 +26,9 @@ module.exports = {
           );
 
           if (affectedRows > 0) {
-            await interaction.reply({
-              content: `Wallet Address updated to \`${walletAddress}\``,
-              ephemeral: true,
-            });
+            await interaction.reply(
+              privateMessage(`Wallet Address updated to \`${walletAddress}\``)
+            );
           }
         } else {
           const user = await User.create({
@@ -39,10 +36,11 @@ module.exports = {
             wallet_address: walletAddress,
           });
 
-          await interaction.reply({
-            content: `Wallet Address - \`${user.wallet_address}\` added for \`${user.username}\``,
-            ephemeral: true,
-          });
+          await interaction.reply(
+            privateMessage(
+              `Wallet Address - \`${user.wallet_address}\` added for \`${user.username}\``
+            )
+          );
         }
       } catch (err) {
         console.error(err);

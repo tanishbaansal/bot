@@ -77,15 +77,11 @@ client.on(Events.InteractionCreate, async (interaction) => {
   } catch (error) {
     console.error(error);
     const errorMessage = "There was an error while executing this command!";
-    const responseOptions = {
-      content: errorMessage,
-      ephemeral: true,
-    };
 
     if (interaction.replied || interaction.deferred) {
-      await interaction.followUp(responseOptions);
+      await interaction.followUp(privateMessage(errorMessage));
     } else {
-      await interaction.reply(responseOptions);
+      await interaction.reply(privateMessage(errorMessage));
     }
   }
 });
