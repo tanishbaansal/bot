@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, AttachmentBuilder } = require("discord.js");
 const { User } = require("../../database");
 const fs = require("fs").promises;
+const { privateMessage } = require("../../utils/message");
 
 async function writeToFile(filename, data) {
   try {

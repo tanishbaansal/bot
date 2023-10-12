@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require("discord.js");
 const { User, Submission } = require("../../database");
 const { v4 } = require("uuid");
 const { sanityApiKey, sanityApiUrl } = require("./../../config.json");
+const { privateMessage } = require("../../utils/message");
 
 async function getQuestDetail(questName) {
   const query = encodeURIComponent(`*[_type == "quest" && title == "${questName}"]`);
@@ -103,14 +104,14 @@ module.exports = {
 
                 if (response && submission) {
                   interaction.followUp(`<@${interaction.user.id}> Your screenshot got approved!`);
-                  message.author.send("Your screenshot got approved!");
+                  message.author.send(`Your screenshot got approved! ${message.url}`);
                 } else {
                   interaction.followUp(`Some Error Occurred!`);
                   console.log("Error occurred while saving bounty to sanity");
                 }
               } else {
-                interaction.followUp("You screenshot got disapproved!");
-                message.author.send("Your screenshot got disapproved!");
+                interaction.followUp(`<@${interaction.user.id}> Your screenshot got disapproved!`);
+                message.author.send(`Your screenshot got disapproved! ${message.url}`);
               }
             })
             .catch((err) => {
