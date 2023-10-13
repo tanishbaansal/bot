@@ -1,13 +1,6 @@
 const fs = require("node:fs");
 const path = require("node:path");
-const {
-  Client,
-  Collection,
-  GatewayIntentBits,
-  Events,
-  SlashCommandBuilder,
-} = require("discord.js");
-const { botToken } = require("./config.json");
+const { Client, Collection, GatewayIntentBits, Events } = require("discord.js");
 const getWallet = require("./commands/wallet/get-wallet");
 
 const { User, Submission } = require("./database");
@@ -18,6 +11,7 @@ const downloadWallets = require("./commands/wallet/download-wallets");
 
 const { privateMessage } = require("./utils/message");
 
+const botToken = process.env.BOT_TOKEN;
 // Command files are now organized into subfolders
 const commandsPath = path.join(__dirname, "commands");
 const client = new Client({

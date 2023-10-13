@@ -1,7 +1,10 @@
 const { User, Submission } = require("./../database");
 const { v4 } = require("uuid");
-const { sanityApiKey, sanityApiUrl } = require("../config.json");
 const { privateMessage } = require("./message");
+require("dotenv").config();
+
+const sanityApiUrl = process.env.SANITY_API_URL;
+const sanityApiKey = process.env.SANITY_API_KEY;
 
 async function getQuestDetail(questName) {
   const query = encodeURIComponent(`*[_type == "quest" && title == "${questName}"]`);
