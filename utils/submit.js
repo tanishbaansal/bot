@@ -59,6 +59,7 @@ const createBounty = async (args) => {
 
 const submitImage = async (message, questDetails) => {
   const user = await User.findOne({ where: { username: message.member.user.username } });
+  console.log(`User ${JSON.stringify(user)}`);
   if (user) {
     message.reply(
       privateMessage("Thanks for sharing! One of our admins will approve this shortly")
