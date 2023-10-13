@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, AttachmentBuilder } = require("discord.js");
 const { User, Submission } = require("../../database");
 const fs = require("fs").promises;
+const path = require("path");
 const { privateMessage } = require("../../utils/message");
 
 async function writeToFile(filename, data) {
@@ -49,7 +50,9 @@ module.exports = {
         const filename = `submission-${currentDate}.csv`;
         const folderPath = "csv/submission/";
         await writeToFile(`${folderPath}${filename}`, csvData);
-        const file = new AttachmentBuilder(`${folderPath}${filename}`);
+        const file = new AttachmentBuilder(
+          path.resolve(__dirname, `../../${folderPath}${filename}`)
+        );
         await interaction.reply({ ephemeral: true, files: [file] });
       }
     } catch (error) {
