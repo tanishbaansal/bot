@@ -36,6 +36,7 @@ module.exports = {
         const filename = `wallets-${currentDate}.csv`;
         const folderPath = "csv/wallet/";
         await writeToFile(`${folderPath}${filename}`, csvData);
+        console.log(`CSV file created at ${folderPath}${filename}`);
         const file = new AttachmentBuilder(`${folderPath}${filename}`);
         await interaction.reply({ ephemeral: true, files: [file] });
       }
