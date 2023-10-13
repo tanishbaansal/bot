@@ -77,7 +77,6 @@ const submitImage = async (message, questDetails) => {
       .awaitReactions({ filter: collectorFilter, max: 1 })
       .then(async (collected) => {
         const reaction = collected.first();
-        const channelName = message.channel.name;
 
         if (reaction.emoji.name === "👍") {
           if (questDetails) {
@@ -90,8 +89,8 @@ const submitImage = async (message, questDetails) => {
 
             if (response) {
               const submission = await Submission.create({
-                attachmentURL: message.attachments.first().url,
-                channelName,
+                attachment_url: message.attachments.first().url,
+                channel_name: message.channel.name,
                 userId: user.id,
               });
 

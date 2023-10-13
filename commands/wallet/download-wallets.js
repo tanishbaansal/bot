@@ -34,8 +34,9 @@ module.exports = {
 
         const currentDate = new Date().toISOString().split("T")[0]; // Get YYYY-MM-DD format
         const filename = `wallets-${currentDate}.csv`;
-        await writeToFile(`csv/${filename}`, csvData);
-        const file = new AttachmentBuilder(`csv/${filename}`);
+        const folderPath = "csv/wallet/";
+        await writeToFile(`${folderPath}${filename}`, csvData);
+        const file = new AttachmentBuilder(`${folderPath}${filename}`);
         await interaction.reply({ ephemeral: true, files: [file] });
       }
     } catch (error) {

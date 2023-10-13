@@ -16,8 +16,8 @@ const User = sequelize.define("user", {
 });
 
 const Submission = sequelize.define("submission", {
-  attachmentURL: Sequelize.STRING,
-  channelName: Sequelize.STRING,
+  attachment_url: Sequelize.STRING,
+  channel_name: Sequelize.STRING,
 });
 
 // Define the association between User and Submission
