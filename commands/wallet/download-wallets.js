@@ -24,7 +24,7 @@ module.exports = {
 
         if (userList.length === 0) {
           // Handle case when there are no users in the database
-          await interaction.reply("No users found in the database.");
+          await interaction.reply(privateMessage("No users found in the database."));
           return;
         }
 
@@ -37,7 +37,7 @@ module.exports = {
         const folderPath = "csv/wallet/";
         await writeToFile(`${folderPath}${filename}`, csvData);
         console.log(`CSV file created at ${folderPath}${filename}`);
-        const file = new AttachmentBuilder(`${folderPath}${filename}`);
+        const file = new AttachmentBuilder(`./${folderPath}${filename}`);
         await interaction.reply({ ephemeral: true, files: [file] });
       }
     } catch (error) {
