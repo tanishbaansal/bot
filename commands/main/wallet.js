@@ -41,6 +41,7 @@ module.exports = {
               `Wallet Address - \`${user.wallet_address}\` added for \`${user.username}\``
             )
           );
+          console.log(`Wallet Address added for \`${user.username}\``);
         }
       } catch (err) {
         console.error(err);

@@ -64,6 +64,7 @@ const submitImage = async (message, questDetails) => {
       privateMessage("Thanks for sharing! One of our admins will approve this shortly")
     );
 
+    console.log(`\`${message.member.user.username}\` Uploaded a screenshot`);
     const collectorFilter = (reaction, user) => {
       return (
         ["👍", "👎"].includes(reaction.emoji.name) &&
