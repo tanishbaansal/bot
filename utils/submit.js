@@ -61,6 +61,7 @@ const submitImage = async (message, questDetails) => {
   const user = await User.findOne({ where: { username: message.member.user.username } });
   console.log(`User ${JSON.stringify(user)}`);
   if (user) {
+    console.log(`\`${message.member.user.username}\` Thanks for sharing`);
     message.reply(
       privateMessage("Thanks for sharing! One of our admins will approve this shortly")
     );
@@ -118,6 +119,34 @@ const submitImage = async (message, questDetails) => {
         console.error(err);
       });
   } else {
+    const walletAddress = new ButtonBuilder()
+      .setCustomId("walletAddress")
+      .setLabel("Wallet Address")
+      .setStyle(ButtonStyle.Danger);
+
+    const row = new ActionRowBuilder().addComponents(walletAddress);
+
+    const modal = new ModalBuilder()
+      .setCustomId("enterWalletAddress")
+      .setTitle("Submit Wallet Address");
+
+    // Create the text input components
+    const walletAddressInput = new TextInputBuilder()
+      .setCustomId("walletAddress")
+      // The label is the prompt the user sees for this input
+      .setLabel("Wallet Address")
+      // Short means only a single line of text
+      .setStyle(TextInputStyle.Short);
+
+    // An action row only holds one text input,
+    // so you need one action row per text input.
+    const actionRow = new ActionRowBuilder().addComponents(walletAddressInput);
+
+    // Add inputs to the modal
+    modal.addComponents(actionRow);
+
+    // Show the modal to the user
+    await interaction.showModal(modal);
     message.reply(
       privateMessage(
         `Please submit your wallet address using the command \`/wallet\` first then submit the image again.`
