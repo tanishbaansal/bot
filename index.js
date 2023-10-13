@@ -13,7 +13,10 @@ const getWallet = require("./commands/wallet/get-wallet");
 const { User, Submission } = require("./database");
 const wallet = require("./commands/main/wallet");
 const help = require("./commands/main/help");
+const { getQuestDetail, submitImage } = require("./utils/submit");
 const downloadWallets = require("./commands/wallet/download-wallets");
+
+const { privateMessage } = require("./utils/message");
 
 // Command files are now organized into subfolders
 const commandsPath = path.join(__dirname, "commands");
@@ -53,16 +56,21 @@ client.once(Events.ClientReady, () => {
   User.sync();
   Submission.sync();
   client.user.setActivity("Own Your Saga");
-  client.application?.commands.create(
-    new SlashCommandBuilder()
-      .setName("react-await")
-      .setDescription("Provides information about the user."),
-    "1154792166292455435"
-  );
   // Create commands using a loop and an array of command data
   const commandData = [wallet.data, help.data, getWallet.data, downloadWallets.data];
   for (const data of commandData) {
     client.application?.commands.create(data, "1154792166292455435");
+  }
+});
+client.on(Events.MessageCreate, async (message) => {
+  if (message.attachments.size > 0) {
+    console.log(`Image`);
+    const channelName = message.channel.name;
+    const questDetails = await getQuestDetail(channelName);
+    if (questDetails) {
+      console.log(`Image and quest`);
+      submitImage(message, questDetails);
+    }
   }
 });
 
