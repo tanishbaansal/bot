@@ -12,6 +12,7 @@
   "dependencies": {
     "discord.js": "^14.13.0",
     "dotenv": "^16.3.1",
-    "node": "^20.7.0"
+    "node": "^20.7.0",
+    "sequelize": "^6.33.0"
   }
 }
